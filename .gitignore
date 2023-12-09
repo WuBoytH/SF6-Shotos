@@ -1,0 +1,7 @@
+**/target
+**/*.py
+**/*.pyc
+**/*.zip
+Thumbnails
+Cargo.lock
+.DS_Store

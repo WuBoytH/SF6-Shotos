@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<struct>
+  <list hash="fighter_param_table">
+    <!-- MARIO -->
+    <hash40 index="0">dummy</hash40>
+    <!-- DONKEY KONG -->
+    <hash40 index="1">dummy</hash40>
+    <!-- LINK -->
+    <hash40 index="2">dummy</hash40>
+    <!-- SAMUS -->
+    <hash40 index="3">dummy</hash40>
+    <!-- YOSHI -->
+    <hash40 index="4">dummy</hash40>
+    <!-- KIRBY -->
+    <hash40 index="5">dummy</hash40>
+    <!-- FOX -->
+    <hash40 index="6">dummy</hash40>
+    <!-- PIKACHU -->
+    <hash40 index="7">dummy</hash40>
+    <!-- LUIGI -->
+    <hash40 index="8">dummy</hash40>
+    <!-- NESS -->
+    <hash40 index="9">dummy</hash40>
+    <!-- CAPTAIN FALCON -->
+    <hash40 index="10">dummy</hash40>
+    <!-- JIGGLYPUFF -->
+    <hash40 index="11">dummy</hash40>
+    <!-- PEACH -->
+    <hash40 index="12">dummy</hash40>
+    <!-- BOWSER -->
+    <hash40 index="13">dummy</hash40>
+    <!-- POPO -->
+    <hash40 index="14">dummy</hash40>
+    <!-- NANA -->
+    <hash40 index="15">dummy</hash40>
+    <!-- SHEIK -->
+    <hash40 index="16">dummy</hash40>
+    <!-- ZELDA -->
+    <hash40 index="17">dummy</hash40>
+    <!-- DR. MARIO -->
+    <hash40 index="18">dummy</hash40>
+    <!-- PICHU -->
+    <hash40 index="19">dummy</hash40>
+    <!-- FALCO -->
+    <hash40 index="20">dummy</hash40>
+    <!-- MARTH -->
+    <hash40 index="21">dummy</hash40>
+    <!-- YOUNG LINK -->
+    <hash40 index="22">dummy</hash40>
+    <!-- GANONDORF -->
+    <hash40 index="23">dummy</hash40>
+    <!-- MEWTWO -->
+    <hash40 index="24">dummy</hash40>
+    <!-- ROY -->
+    <hash40 index="25">dummy</hash40>
+    <!-- MR. GAME & WATCH -->
+    <hash40 index="26">dummy</hash40>
+    <!-- META KNIGHT -->
+    <hash40 index="27">dummy</hash40>
+    <!-- PIT -->
+    <hash40 index="28">dummy</hash40>
+    <!-- ZERO SUIT SAMUS -->
+    <hash40 index="29">dummy</hash40>
+    <!-- WARIO -->
+    <hash40 index="30">dummy</hash40>
+    <!-- SNAKE -->
+    <hash40 index="31">dummy</hash40>
+    <!-- IKE -->
+    <hash40 index="32">dummy</hash40>
+    <!-- SQUIRTLE -->
+    <hash40 index="33">dummy</hash40>
+    <!-- IVYSAUR -->
+    <hash40 index="34">dummy</hash40>
+    <!-- CHARIZARD -->
+    <hash40 index="35">dummy</hash40>
+    <!-- DIDDY KONG -->
+    <hash40 index="36">dummy</hash40>
+    <!-- LUCAS -->
+    <hash40 index="37">dummy</hash40>
+    <!-- SONIC -->
+    <hash40 index="38">dummy</hash40>
+    <!-- KING DEDEDE -->
+    <hash40 index="39">dummy</hash40>
+    <!-- OLIMAR -->
+    <hash40 index="40">dummy</hash40>
+    <!-- LUCARIO -->
+    <hash40 index="41">dummy</hash40>
+    <!-- R.O.B. -->
+    <hash40 index="42">dummy</hash40>
+    <!-- TOON LINK -->
+    <hash40 index="43">dummy</hash40>
+    <!-- WOLF -->
+    <hash40 index="44">dummy</hash40>
+    <!-- VILLAGER -->
+    <hash40 index="45">dummy</hash40>
+    <!-- MEGA MAN -->
+    <hash40 index="46">dummy</hash40>
+    <!-- WII FIT TRAINER -->
+    <hash40 index="47">dummy</hash40>
+    <!-- ROSALINA & LUMA -->
+    <hash40 index="48">dummy</hash40>
+    <!-- LITTLE MAC -->
+    <hash40 index="49">dummy</hash40>
+    <!-- GRENINJA -->
+    <hash40 index="50">dummy</hash40>
+    <!-- PALUTENA -->
+    <hash40 index="51">dummy</hash40>
+    <!-- PAC-MAN -->
+    <hash40 index="52">dummy</hash40>
+    <!-- ROBIN -->
+    <hash40 index="53">dummy</hash40>
+    <!-- SHULK -->
+    <hash40 index="54">dummy</hash40>
+    <!-- BOWSER JR. -->
+    <hash40 index="55">dummy</hash40>
+    <!-- DUCK HUNT -->
+    <hash40 index="56">dummy</hash40>
+    <!-- RYU -->
+    <struct index="57">
+      <float hash="landing_attack_air_frame_n">7</float>
+    </struct>
+    <!-- CLOUD -->
+    <hash40 index="58">dummy</hash40>
+    <!-- CORRIN -->
+    <hash40 index="59">dummy</hash40>
+    <!-- BAYONETTA -->
+    <hash40 index="60">dummy</hash40>
+    <!-- INKLING -->
+    <hash40 index="61">dummy</hash40>
+    <!-- RIDLEY -->
+    <hash40 index="62">dummy</hash40>
+    <!-- SIMON -->
+    <hash40 index="63">dummy</hash40>
+    <!-- KING K. ROOL-->
+    <hash40 index="64">dummy</hash40>
+    <!-- ISABELLE -->
+    <hash40 index="65">dummy</hash40>
+    <!-- INCINEROAR -->
+    <hash40 index="66">dummy</hash40>
+    <!-- PIRANHA PLANT -->
+    <hash40 index="67">dummy</hash40>
+    <!-- JOKER -->
+    <hash40 index="68">dummy</hash40>
+    <!-- HERO -->
+    <hash40 index="69">dummy</hash40>
+    <!-- BANJO & KAZOOIE -->
+    <hash40 index="70">dummy</hash40>
+    <!-- TERRY -->
+    <hash40 index="71">dummy</hash40>
+    <!-- BYLETH -->
+    <hash40 index="72">dummy</hash40>
+    <!-- MIN MIN -->
+    <hash40 index="73">dummy</hash40>
+    <!-- STEVE -->
+    <hash40 index="74">dummy</hash40>
+    <!-- KAZUYA -->
+    <hash40 index="75">dummy</hash40>
+    <!-- SORA -->
+    <hash40 index="76">dummy</hash40>
+    <!-- PYRA -->
+    <hash40 index="77">dummy</hash40>
+    <!-- MYTHRA -->
+    <hash40 index="78">dummy</hash40>
+    <!-- SEPHIROTH -->
+    <hash40 index="79">dummy</hash40>
+    <!-- MII BRAWLER -->
+    <hash40 index="80">dummy</hash40>
+    <!-- MII SWORDFIGHTER -->
+    <hash40 index="81">dummy</hash40>
+    <!-- MII GUNNER -->
+    <hash40 index="82">dummy</hash40>
+    <!-- DARK SAMUS -->
+    <hash40 index="83">dummy</hash40>
+    <!-- DAISY -->
+    <hash40 index="84">dummy</hash40>
+    <!-- LUCINA -->
+    <hash40 index="85">dummy</hash40>
+    <!-- CHROM -->
+    <hash40 index="86">dummy</hash40>
+    <!-- DARK PIT -->
+    <hash40 index="87">dummy</hash40>
+    <!-- KEN -->
+    <struct index="88">
+      <float hash="landing_attack_air_frame_n">7</float>
+      <int hash="s3_combo_max">2</int>
+      <float hash="combo_attack_32_end">20</float>
+    </struct>
+    <!-- RICHTER -->
+    <hash40 index="89">dummy</hash40>
+    <!-- GIGA BOWSER -->
+    <hash40 index="90">dummy</hash40>
+    <!-- MII BRAWLER (FIGHTING TEAM) -->
+    <hash40 index="91">dummy</hash40>
+    <!-- MII SWORDFIGHTER (FIGHTING TEAM) -->
+    <hash40 index="92">dummy</hash40>
+    <!-- MII GUNNER (FIGHTING TEAM) -->
+    <hash40 index="93">dummy</hash40>
+  </list>
+</struct>
