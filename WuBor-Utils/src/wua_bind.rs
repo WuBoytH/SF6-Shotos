@@ -10,7 +10,8 @@ use {
     crate::{
         vars::*,
         table_const::*,
-        cancels::*
+        cancels::*,
+        app::*
     }
 };
 
@@ -617,11 +618,14 @@ pub mod MiscModule {
         }
     }
     
-    #[skyline::from_offset(0x3ac540)]
+    #[skyline::from_offset(0x3ac560)]
     pub fn get_battle_object_from_id(id: u32) -> *mut BattleObject;
 
     pub unsafe fn get_vars_from_pocket(module_accessor: *mut BattleObjectModuleAccessor) -> bool {
         // println!("Weapon ID: {:#x}", (*module_accessor).battle_object_id);
+        if (*module_accessor).battle_object_id >> 0x1c != *BATTLE_OBJECT_CATEGORY_WEAPON as u32 {
+            return false;
+        }
         let owner_object_id = WorkModule::get_int(module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER) as u32;
         // println!("Owner ID: {:#x}", owner_object_id);
         let owner_cat = sv_battle_object::category(owner_object_id);
@@ -649,6 +653,9 @@ pub mod MiscModule {
     }
 
     pub unsafe fn get_vars_from_pocket_by_object_id(object_id: u32, owner_object_id: u32) -> bool {
+        if object_id >> 0x1c != *BATTLE_OBJECT_CATEGORY_WEAPON as u32 {
+            return false;
+        }
         // println!("Owner ID: {:#x}", owner_object_id);
         let owner_cat = sv_battle_object::category(owner_object_id);
         // println!("Owner Category: {:#x}", owner_cat);
@@ -699,7 +706,7 @@ pub mod MiscModule {
         }
     }
     
-    #[skyline::from_offset(0x696700)]
+    #[skyline::from_offset(0x696720)]
     pub fn call_critical(
         module_accessor: *mut BattleObjectModuleAccessor,
         unk: u64,
@@ -710,6 +717,121 @@ pub mod MiscModule {
         unk5: i32,
         unk6: i32
     ) -> u64;
+
+    pub fn patch_vtable_function(offset: usize, function: u64) {
+        // println!("function ptr: {:#x}", function as u64);
+        let low = (function as u64 & 0xFFFFFFFF) as u32;
+        // println!("Low to Big Endian: {:#x} > {:#?}", low, low.to_be_bytes());
+        let high = (function as u64 >> 32) as u32;
+        // println!("High to Big Endian: {:#x} > {:#?}", high, high.to_be_bytes());
+        let _ = skyline::patching::Patch::in_text(offset).data(low);
+        let _ = skyline::patching::Patch::in_text(offset + 0x4).data(high);
+    }
+
+    /// Used to create custom shield boxes that can be called in ACMD. Below is an example of how it would be created.
+    /// ```
+    /// #[skyline::hook(offset = 0xcd98a0)]
+    /// unsafe extern "C" fn marth_lucina_init(vtable: u64, fighter: &mut Fighter) {
+    ///     original!()(vtable, fighter);
+    ///     if (*fighter).battle_object.kind == *FIGHTER_KIND_LUCINA as u32 {
+    ///         let shield_data = ShieldDataResource::new(
+    ///             0.0,
+    ///             0.0,
+    ///             0.0,
+    ///             0.0,
+    ///             0.0,
+    ///             0.0,
+    ///             10.0,
+    ///             Hash40::new("hip"),
+    ///             *COLLISION_SHAPE_TYPE_CAPSULE as u8,
+    ///             *SHIELD_TYPE_UNDEFINED as u8
+    ///         );
+    ///         let shield_datas = &mut (ShieldDatas::new().add(shield_data, 0));
+    ///         let resource = &mut ShieldGroupResource::new(
+    ///             shield_datas,
+    ///             1,
+    ///             0,
+    ///             false,
+    ///             false,
+    ///             false
+    ///         );
+    ///         let module_accessor = (*fighter).battle_object.module_accessor;
+    ///         MiscModule::add_shield_group(module_accessor, resource, 2);
+    ///     }
+    /// }
+    /// ````
+    pub unsafe fn add_shield_group(module_accessor: *mut BattleObjectModuleAccessor, resource: *mut ShieldGroupResource, group_id: i32) {
+        // Get Vtable Function
+        let shield_module = (module_accessor as *mut u64).add(0x100 / 8);
+        let vtable = *shield_module as *const u64;
+        let ptr = *((*vtable + 0x58) as *const u64);
+        let set_shield_group: extern "C" fn(*mut u64, *mut ShieldGroupResource, i32) = std::mem::transmute(ptr);
+
+        // Redefine ShieldModule
+        let shield_module = *(module_accessor as *mut *mut u64).add(0x100 / 8);
+
+        set_shield_group(shield_module, resource, group_id);
+        let count = (*resource).count as i32;
+        if count > 0 {
+            for x in 0..count {
+                ShieldModule::set_status(module_accessor, x, ShieldStatus(*SHIELD_STATUS_NONE), group_id);
+            }
+        }
+    }
+
+    /// Used to create custom reflector boxes that can be called in ACMD. Below is an example of how it would be created.
+    /// ```
+    /// #[skyline::hook(offset = 0xcd98a0)]
+    /// unsafe extern "C" fn marth_lucina_init(vtable: u64, fighter: &mut Fighter) {
+    ///     original!()(vtable, fighter);
+    ///     if (*fighter).battle_object.kind == *FIGHTER_KIND_LUCINA as u32 {
+    ///         let shield_data = ShieldData::new(
+    ///             0.0,
+    ///             0.0,
+    ///             0.0,
+    ///             0.0,
+    ///             0.0,
+    ///             0.0,
+    ///             10.0,
+    ///             Hash40::new("hip"),
+    ///             *COLLISION_SHAPE_TYPE_CAPSULE as u8,
+    ///             *SHIELD_TYPE_UNDEFINED as u8
+    ///         );
+    ///         let shield_datas = &mut (ShieldDatas2::new().add(shield_data, 0));
+    ///         let resource = &mut ShieldGroupResource2::new(
+    ///             shield_datas,
+    ///             1,
+    ///             4.0,
+    ///             4.0,
+    ///             100.0,
+    ///             20.0,
+    ///             false,
+    ///             0
+    ///         );
+    ///         let module_accessor = (*fighter).battle_object.module_accessor;
+    ///         MiscModule::add_reflector_group(module_accessor, resource, 1);
+    ///         ReflectorModule::set_hop(module_accessor, true, 45.0, 1);
+    ///     }
+    /// }
+    /// ````
+    pub unsafe fn add_reflector_group(module_accessor: *mut BattleObjectModuleAccessor, resource: *mut ShieldGroupResource2, group_id: i32) {
+        // Get Vtable Function
+        let reflector_module = (module_accessor as *mut u64).add(0x108 / 8);
+        let vtable = *reflector_module as *const u64;
+        let ptr = *((*vtable + 0x60) as *const u64);
+        let set_shield_group2: extern "C" fn(*mut u64, *mut ShieldGroupResource2, i32) = std::mem::transmute(ptr);
+
+        // Redefine ReflectorModule
+        let reflector_module = *(module_accessor as *mut *mut u64).add(0x108 / 8);
+
+        set_shield_group2(reflector_module, resource, group_id);
+        let count = (*resource).count as i32;
+        if count > 0 {
+            for x in 0..count {
+                ReflectorModule::set_status(module_accessor, x, ShieldStatus(*SHIELD_STATUS_NONE), group_id);
+            }
+        }
+    }
 }
 
 extern "C" {

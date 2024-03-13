@@ -167,8 +167,7 @@ unsafe extern "C" fn ryu_special_s_loop_init(fighter: &mut L2CFighterCommon) -> 
 unsafe extern "C" fn ryu_special_s_loop_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let start_sit = WorkModule::get_int(fighter.module_accessor, *FIGHTER_RYU_STATUS_WORK_ID_SPECIAL_S_INT_START_SITUATION);
     if start_sit == *SITUATION_KIND_GROUND {
-        let original = smashline::original_status(smashline::Main, fighter, *FIGHTER_RYU_STATUS_KIND_SPECIAL_S_LOOP);
-        return original(fighter);
+        return smashline::original_status(smashline::Main, fighter, *FIGHTER_RYU_STATUS_KIND_SPECIAL_S_LOOP)(fighter);
     }
     WorkModule::off_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_WORK_ID_SPECIAL_S_FLAG_GROUND);
     MotionModule::change_motion(

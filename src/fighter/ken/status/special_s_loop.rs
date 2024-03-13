@@ -161,8 +161,7 @@ unsafe extern "C" fn ken_special_s_loop_main(fighter: &mut L2CFighterCommon) -> 
             fighter.change_status(FIGHTER_RYU_STATUS_KIND_SPECIAL_S_END.into(), false.into());
             return 1.into();
         }
-        let original = smashline::original_status(smashline::Main, fighter, *FIGHTER_RYU_STATUS_KIND_SPECIAL_S_LOOP);
-        return original(fighter);
+        return smashline::original_status(smashline::Main, fighter, *FIGHTER_RYU_STATUS_KIND_SPECIAL_S_LOOP)(fighter);
     }
     WorkModule::off_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_WORK_ID_SPECIAL_S_FLAG_GROUND);
     MotionModule::change_motion(
