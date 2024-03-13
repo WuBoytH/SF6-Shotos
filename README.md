@@ -2,6 +2,8 @@
 
 Ryu and Ken gain new moves and mechanics from Street Fighter 6.
 
+[Changelog](https://docs.google.com/document/d/1CHo3C98UwsmMf7TYrIvQ8Y3ZWgicOUYXPyqy0kKbrls/edit?usp=sharing)
+
 Separated from The WuBor Patch.
 
 ## Dependencies
