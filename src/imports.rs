@@ -7,6 +7,7 @@ pub mod acmd_imports {
             app::{lua_bind::*, sv_animcmd::*, *},
             lib::lua_const::*
         },
+        smashline::*,
         smash_script::*,
         custom_var::*,
         wubor_utils::{wua_bind::*, vars::*}
