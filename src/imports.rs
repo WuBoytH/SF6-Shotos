@@ -23,6 +23,7 @@ pub mod status_imports {
             app::{lua_bind::*, *},
             lib::{lua_const::*, L2CValue}
         },
+        smashline::*,
         smash_script::*,
         custom_var::*,
         wubor_utils::{wua_bind::*, vars::*, table_const::*}

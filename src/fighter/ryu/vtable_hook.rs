@@ -6,15 +6,22 @@ unsafe extern "C" fn ryu_ken_init(_vtable: u64, fighter: &mut Fighter) {
     let module_accessor = fighter.battle_object.module_accessor;
     let control_energy = KineticModule::get_energy(module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
     *(control_energy as *mut u8).add(0xa4) = 1;
-    // FGCModule::set_command_input_button(module_accessor, 0, 2);
-    // FGCModule::set_command_input_button(module_accessor, 1, 2);
-    // FGCModule::set_command_input_button(module_accessor, 2, 2);
-    // FGCModule::set_command_input_button(module_accessor, 3, 2);
-    // FGCModule::set_command_input_button(module_accessor, 7, 2);
-    // FGCModule::set_command_input_button(module_accessor, 8, 2);
-    // FGCModule::set_command_input_button(module_accessor, 9, 2);
-    // FGCModule::set_command_input_button(module_accessor, 10, 2);
-    // FGCModule::set_command_input_button(module_accessor, 11, 2);
+    FGCModule::set_command_input_button(module_accessor, Cat4::SPECIAL_N_COMMAND, 1);
+    FGCModule::set_command_input_button(module_accessor, Cat4::SPECIAL_S_COMMAND, 2);
+    FGCModule::set_command_input_button(module_accessor, Cat4::SPECIAL_HI_COMMAND, 1);
+    if fighter.battle_object.kind == 0x3c {
+        FGCModule::clone_command_input(module_accessor, Cat4::SPECIAL_S_COMMAND, Cat4::SPECIAL_N2_COMMAND);
+        FGCModule::set_command_input_button(module_accessor, Cat4::SPECIAL_N2_COMMAND, 1);
+    }
+    else {
+        FGCModule::clone_command_input(module_accessor, Cat4::SPECIAL_HI_COMMAND, Cat4::SPECIAL_N2_COMMAND);
+        FGCModule::set_command_input_button(module_accessor, Cat4::SPECIAL_N2_COMMAND, 2);
+        FGCModule::clone_command_input(module_accessor, Cat4::SPECIAL_N_COMMAND, Cat4::ATTACK_COMMAND1);
+        FGCModule::set_command_input_button(module_accessor, Cat4::ATTACK_COMMAND1, 2);
+    }
+    FGCModule::clone_command_input(module_accessor, Cat4::SUPER_SPECIAL2_COMMAND, Cat4::SUPER_SPECIAL_COMMAND);
+    FGCModule::set_command_input_button(module_accessor, Cat4::SUPER_SPECIAL_COMMAND, 1);
+    FGCModule::set_command_input_button(module_accessor, Cat4::SUPER_SPECIAL2_COMMAND, 2);
 }
 
 #[skyline::from_offset(0x646fe0)]
@@ -306,6 +313,11 @@ unsafe extern "C" fn ryu_ken_on_hit(vtable: u64, fighter: &mut Fighter, log: u64
         }
         return;
     }
+    if status == *FIGHTER_STATUS_KIND_FINAL {
+        if collision_kind != 1 {
+            return;
+        }
+    }
     original!()(vtable, fighter, log, some_float);
 }
 
@@ -390,7 +402,142 @@ unsafe extern "C" fn ryu_ken_on_damage(vtable: u64, fighter: &mut Fighter, on_da
     }
 }
 
+#[skyline::hook(offset = 0x10d5f30)]
+unsafe extern "C" fn ryu_ken_frame(vtable: u64, fighter: &mut Fighter) {
+    original!()(vtable, fighter);
+    let object = &mut fighter.battle_object;
+    let module_accessor = (*object).module_accessor;
+
+    let battle_object_slow = singletons::BattleObjectSlow() as *mut u8;
+    if *battle_object_slow.add(0x8) != 0 && *(battle_object_slow as *const u32) != 2 {
+        return;
+    }
+
+    if WorkModule::is_flag(module_accessor, 0x200000e9)
+    && WorkModule::is_flag(module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL) {
+        let work_module = *(module_accessor as *const *const u64).add(0x50 / 8);
+        if ryu_ken_check_final_can_cancel(work_module) {
+            let cat1 = ControlModule::get_command_flag_cat(module_accessor, 0);
+            let cat4 = ControlModule::get_command_flag_cat(module_accessor, 3);
+            let mut status = -1;
+            if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL_COMMAND != 0 {
+                VarModule::on_flag(module_accessor, ryu::instance::flag::SKIP_FINAL_PROX_CHECK);
+                status = *FIGHTER_RYU_STATUS_KIND_FINAL2;
+            }
+            else if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL2_COMMAND != 0 {
+                VarModule::on_flag(module_accessor, ryu::instance::flag::SKIP_FINAL_PROX_CHECK);
+                status = *FIGHTER_STATUS_KIND_FINAL;
+            }
+            else if cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_SPECIAL_N != 0 {
+                status = *FIGHTER_STATUS_KIND_FINAL;
+            }
+            if status != -1 {
+                if StopModule::is_stop(module_accessor) && StopModule::is_hit(module_accessor) {
+                    StopModule::cancel_hit_stop(module_accessor);
+                }
+                if SlowModule::frame(module_accessor, 1) > 1 {
+                    SlowModule::clear_immediate(module_accessor, 1, false);
+                }
+                StatusModule::change_status_request(module_accessor, status, true);
+            }
+        }
+    }
+}
+
+#[skyline::from_offset(0x695c80)]
+fn ryu_ken_check_final_can_cancel(work_module: *const u64) -> bool;
+
+#[skyline::hook(offset = 0x10d6a10)]
+unsafe extern "C" fn ryu_ken_status_change_callback(_vtable: u64, fighter: &mut Fighter) {
+    let module_accessor = fighter.battle_object.module_accessor;
+    let status = StatusModule::status_kind(module_accessor);
+    let force_reset;
+    let command_kind;
+    if fighter.battle_object.kind == *FIGHTER_KIND_KIRBY as u32 {
+        if status == *FIGHTER_KIRBY_STATUS_KIND_RYU_SPECIAL_N2_COMMAND {
+            force_reset = false;
+            command_kind = 1;
+        }
+        else if status == *FIGHTER_KIRBY_STATUS_KIND_RYU_SPECIAL_N_COMMAND {
+            force_reset = false;
+            command_kind = 0;
+        }
+        else if status == *FIGHTER_KIRBY_STATUS_KIND_RYU_SPECIAL_N {
+            force_reset = false;
+            command_kind = -1;
+        }
+        else {
+            force_reset = true;
+            command_kind = -1;
+        }
+    }
+    else {
+        if [
+            *FIGHTER_STATUS_KIND_SPECIAL_N,
+            *FIGHTER_STATUS_KIND_SPECIAL_S,
+            *FIGHTER_STATUS_KIND_SPECIAL_HI,
+            *FIGHTER_STATUS_KIND_SPECIAL_LW,
+            *FIGHTER_STATUS_KIND_FINAL,
+            *FIGHTER_RYU_STATUS_KIND_FINAL2
+        ].contains(&status) {
+            force_reset = true;
+            command_kind = -1;
+        }
+        else if status == *FIGHTER_RYU_STATUS_KIND_SPECIAL_N_COMMAND {
+            force_reset = false;
+            command_kind = 0;
+        }
+        else if status == *FIGHTER_RYU_STATUS_KIND_SPECIAL_N2_COMMAND {
+            force_reset = false;
+            command_kind = 1;
+        }
+        else if status == *FIGHTER_RYU_STATUS_KIND_SPECIAL_S_COMMAND {
+            force_reset = false;
+            command_kind = 2;
+        }
+        else if status == *FIGHTER_RYU_STATUS_KIND_SPECIAL_HI_COMMAND {
+            force_reset = false;
+            command_kind = 3;
+        }
+        else {
+            force_reset = true;
+            command_kind = -1;
+        }
+    }
+    let opponent_lr = WorkModule::get_float(module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
+    let lr = PostureModule::lr(module_accessor);
+    if opponent_lr != 0.0
+    && lr != opponent_lr {
+        return;
+    }
+
+    if command_kind < 0 {
+        if !force_reset {
+            return;
+        }
+    }
+    else {
+        let special_command_lr = ControlModule::get_special_command_lr(module_accessor, command_kind);
+        if special_command_lr != 0.0 && special_command_lr != lr {
+            PostureModule::set_lr(module_accessor, special_command_lr);
+            PostureModule::update_rot_y_lr(module_accessor);
+        }
+    }
+    
+    // CommandModule::reset_special_command(module_accessor, false);
+}
+
 pub fn install() {
+    // Patches the original final smash cancel check
+    let _ = skyline::patching::Patch::in_text(0x10d6324).data(0x14000039u32);
+
+    // Allows any status over 0x1de to be final smash cancelable
+    let _ = skyline::patching::Patch::in_text(0x10d67d8).data(0x1400000Au32);
+
+    // Some Kind of Transition Check
+    // Ryu
+    let _ = skyline::patching::Patch::in_text(0x5033eb0 + 0x1F8).data(1u8);
+
     skyline::install_hooks!(
         ryu_ken_init,
         ryu_ken_move_strength_autoturn_handler,
@@ -399,6 +546,8 @@ pub fn install() {
         ryu_ken_on_hit,
         ryu_ken_on_hit_2,
         ryu_ken_on_search,
-        ryu_ken_on_damage
+        ryu_ken_on_damage,
+        ryu_ken_frame,
+        ryu_ken_status_change_callback
     );
 }
