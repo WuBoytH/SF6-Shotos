@@ -14,7 +14,8 @@ unsafe extern "C" fn ryu_special_s_loop_init(fighter: &mut L2CFighterCommon) -> 
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_DISABLE_AIR_SPECIAL_S);
         fighter.clear_lua_stack();
         lua_args!(fighter, FIGHTER_KINETIC_ENERGY_ID_STOP);
-        speed_x = sv_kinetic_energy::get_speed_x(fighter.lua_state_agent);
+        let lr = PostureModule::lr(fighter.module_accessor);
+        speed_x = WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("speed_x_s")) * lr;
     }
     else {
         let speed_x_hash;
@@ -80,7 +81,7 @@ unsafe extern "C" fn ryu_special_s_loop_init(fighter: &mut L2CFighterCommon) -> 
         0.0
     );
     let brake = if start_sit != *SITUATION_KIND_GROUND {
-        0.05
+        0.01
     }
     else {
         0.0
